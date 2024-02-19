@@ -10,11 +10,21 @@ builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
         options.Authority = "https://localhost:5001";
-        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-        {
-            ValidateAudience = false
-        };
+        //options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        //{
+        //    ValidateAudience = false
+        //};
+        options.Audience = "https://localhost:5001/resources";
     });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApiScope", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("scope", "api1");
+    });
+});
 
 var app = builder.Build();
 
@@ -26,9 +36,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
-app.UseAuthorization();
 app.UseAuthentication();
-app.MapControllers();
+app.UseAuthorization();
+app.MapControllers().RequireAuthorization("ApiScope");
 
 app.UseHttpsRedirection();
 

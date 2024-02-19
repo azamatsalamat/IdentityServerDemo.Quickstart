@@ -21,18 +21,6 @@ var request = new ClientCredentialsTokenRequest
     Scope = "api1"
 };
 
-var clone = request.Clone();
-clone.Parameters.AddRequired(OidcConstants.TokenRequest.GrantType, OidcConstants.GrantTypes.ClientCredentials);
-clone.Parameters.AddOptional(OidcConstants.TokenRequest.Scope, request.Scope);
-
-foreach (var resource in request.Resource)
-{
-    clone.Parameters.AddRequired(OidcConstants.TokenRequest.Resource, resource, allowDuplicates: true);
-}
-
-clone.Prepare();
-clone.Method = HttpMethod.Post;
-
 var tokenResponse = await client.RequestClientCredentialsTokenAsync(request);
 
 if (tokenResponse.IsError)

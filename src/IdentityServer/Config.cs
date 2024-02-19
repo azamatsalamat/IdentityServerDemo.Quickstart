@@ -1,4 +1,5 @@
-﻿using IdentityServer4.Models;
+﻿using IdentityServer4;
+using IdentityServer4.Models;
 using System.Collections.Generic;
 
 namespace IdentityServer
@@ -8,7 +9,8 @@ namespace IdentityServer
         public static IEnumerable<IdentityResource> IdentityResources =>
             new IdentityResource[]
             { 
-                new IdentityResources.OpenId()
+                new IdentityResources.OpenId(),
+                new IdentityResources.Profile()
             };
 
         public static IEnumerable<ApiScope> ApiScopes =>
@@ -27,7 +29,24 @@ namespace IdentityServer
                     new Secret("secret1".Sha256())
                 },
                 AllowedScopes = { "api1" }
-            } 
+            },
+            new Client
+            {
+                ClientId = "mvc",
+                ClientSecrets =
+                {
+                    new Secret("secret2".Sha256())
+                },
+                AllowedGrantTypes = GrantTypes.Code,
+                RedirectUris = { "https://localhost:5002/signin-oidc" },
+                PostLogoutRedirectUris = { "https://localhost:5002/signout-callback-oidc" },
+                AllowedScopes = new List<string>
+                {
+                    IdentityServerConstants.StandardScopes.OpenId,
+                    IdentityServerConstants.StandardScopes.Profile
+                },
+                RequirePkce = false
+            }
         };
     }
 }
